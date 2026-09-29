@@ -1,6 +1,10 @@
+import { pathToFileURL } from 'node:url'
+
 const glados = async () => {
   const notice = []
-  if (!process.env.GLADOS) return
+  if (!process.env.GLADOS?.trim()) {
+    throw new Error('GLADOS is not configured')
+  }
   for (const cookie of String(process.env.GLADOS).split('\n')) {
     if (!cookie) continue
     try {
@@ -38,8 +42,11 @@ const glados = async () => {
 }
 
 const notify = async (notice) => {
-  if (!process.env.NOTIFY || !notice) return
-  for (const option of String(process.env.NOTIFY).split('\n')) {
+  if (!notice) return
+  const options = process.env.NOTIFY?.trim()
+    ? String(process.env.NOTIFY).split('\n')
+    : ['console:log']
+  for (const option of options) {
     if (!option) continue
     try {
       if (option.startsWith('console:')) {
@@ -110,8 +117,15 @@ const notify = async (notice) => {
   }
 }
 
+export { glados, notify }
+
 const main = async () => {
   await notify(await glados())
 }
 
-main()
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error('Checkin failed:', error)
+    process.exitCode = 1
+  })
+}

@@ -13,6 +13,17 @@ GitHub Actions 实现 [GLaDOS][glados] 自动签到
 
 1. 启用 Actions, 每天北京时间 00:10 自动签到
 
+### GitHub Actions 初始化
+
+1. 在仓库的 `Settings -> Secrets and variables -> Actions` 中创建仓库 Secret `GLADOS`，值为登录 GLaDOS 后浏览器 Cookie 中的完整内容。
+1. 如果有多个帐号，将每个 Cookie 放在 `GLADOS` 的独立一行。
+1. 打开 `Actions` 页面，选择 `run` 工作流并点击 `Enable workflow`（如果 GitHub 显示该按钮）。
+1. 在 `Actions -> run -> Run workflow` 手动执行一次，查看日志中的 `Checkin OK`、接口消息和剩余天数。
+1. `NOTIFY` 可选。不配置时，工作流会自动使用控制台输出；如需推送通知，再按下方格式创建该 Secret。
+1. `DOMAIN` 可选，默认值为 `glados.cloud`；使用其他站点时创建该 Secret 并填写域名，例如 `railgun.info`。
+
+工作流中的定时任务使用 UTC。当前 `cron: 10 16 * * *` 对应北京时间每天 00:10。首次配置建议先手动运行，确认签到成功后再等待定时任务。
+
 ## 高级功能
 
 1. 如有多个帐号, 可以写为多行 Secret `GLADOS`, 每行写一个 Cookie
